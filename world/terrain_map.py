@@ -5,6 +5,8 @@ from world import terrain
 class TerrainMap:
   def __init__(self, map_name):
     self._map = self._read_map(map_name)
+    self._width = len(self._map[0])
+    self._height = len(self._map)
 
   def _read_map(self, map_name):
     # Build list of all terrain types:
@@ -47,6 +49,14 @@ class TerrainMap:
   # returns a Terrain
   def get(self, position):
     return self._map[position.x][position.y]
+
+  @property
+  def width(self):
+    return self._width
+
+  @property
+  def height(self):
+    return self._height
 
   def dump(self):
     width = len(self._map[0])

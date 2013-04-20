@@ -1,4 +1,4 @@
-from world import robot
+from robot import robot
 
 class Target(robot.Robot):
   def round():
