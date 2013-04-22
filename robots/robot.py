@@ -1,40 +1,45 @@
 
 class Robot:
-  def __init__(self):
-    pass
+  def __init__(self, number):
+    self._number = number
 
   def turn_end(self, data):
-    self.data = data
-    self.move_direction = None
-    self.radar_direction = None
-    self.shot_direction = None
+    self._move_direction = None
+    self._radar_direction = None
+    self._shot_direction = None
 
   def set_move(self, direction):
-    self.move_direction = direction
+    self._move_direction = direction
 
   def get_move(self):
-    return self.move_direction
+    return self._move_direction
 
   def set_radar(self, direction):
-    self.radar_direction = direction
+    self._radar_direction = direction
+
+  def get_radar(self):
+    return self._radar_direction
 
   def set_shot(self, direction):
-    self.shot_direction = direction
+    self._shot_direction = direction
 
-  def round():
+  def get_shot(self):
+    return self._shot_direction
+
+  def round(data):
     pass  # By default, robots do nothing unless 'round' is overridden.
 
   @property
   def name(self):
-    return self.__class__.__name__
+    return self.__class__.__name__ + "(#" + self._number + ")"
 
 
 def load_robots(names):
   robots = []
-  for name in names:
+  for name, number in enumerate(names):
     fp, path, desc = imp.find_module(os.path.join('robots', name.lower()))
     robot_module = imp.load_module(name, fp, path, desc)
     robot = eval('robot_module.%s()' % name)
-    robots.add(robot)
+    robots.add(robot, number)
 
   return robots

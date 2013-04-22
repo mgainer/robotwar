@@ -1,6 +1,6 @@
 import collections
 
-class RobotData(collections.namedtuple(
+RobotData = collections.namedtuple(
     'RobotDataTuple', [
         'position',
         'last_move',
@@ -8,4 +8,14 @@ class RobotData(collections.namedtuple(
         'last_shot',
         'radar_return',
         'health',
-        ]):
+	'map',
+        ])
+
+RadarReturn = collections.namedtuple(
+    'RadarReturnTuple', [
+        'distance',
+        'health',
+	'last_move',
+	])
+
+		
