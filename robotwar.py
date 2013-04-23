@@ -5,11 +5,10 @@ import os
 import sys
 import optparse
 
-from robots import robot
+from robots import robot_module
 from world import master
 from world import play_history
-from world import terrain_map
-
+from world import terrain
 
 
 def parse_options(argv):
@@ -30,12 +29,13 @@ def parse_options(argv):
 def main(argv):
   options = parse_options(argv)
   random.seed(options.random_seed)
-  robots = robot.load_robots(options.robots)
-  world_map = terrain_map.TerrainMap(options.map)
+  world_map = terrain_map.TerrainMap(terrain_map.read_map(options.map))
+  robots = robot.load_robots(options.robots, world_map)
   history = play_history.PlayHistory()
   master = world.master(options, robots, world_map, history)
   master.run()
   history.dump(world_map)
+
 
 if __name__ == '__main__':
   main(sys.argv[1:])

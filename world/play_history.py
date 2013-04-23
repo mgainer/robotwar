@@ -1,92 +1,115 @@
 import collections
 
-# TODO(mgainer) Fix indentation: laptop likes 4-space tabs too much
 class PlayHistory:
   def __init__(self):
-      self._rounds = []
+    self._rounds = []
 
-  def new_round(self, robots):
-    round = Round(robots)
+  def new_round(self):
+    round = Round()
     self._rounds.append(round)
     return round
 
-  def dump(self, map):
-    for round in self._rounds:
+  def dump(self):
+    for number, round in enumerate(self._rounds):
+      print "======================== Round %d =====================" % number
       round.dump()
-      
 
 class Round:
-    def __init__(self, robots):
-        self._actions = {}
-        for robot in robots:
-            action = Action(robot)
-            self._actions[robot] = action
+  def __init__(self):
+    self._actions = {}
 
-    def set_shot(self, robot, direction):
-        self._actions[robot].set_shot(direction)
+  def add_robot(self, robot, position, health):
+    action = Action(position, health)
+    self._actions[robot] = action
 
-    def set_move(self, robot, direction):
-        self._actions[robot].set_move(direction)
+  def set_shot(self, robot, direction, distance):
+    self._actions[robot].set_shot(direction, distance)
 
-    def set_radar(self, robot, direction):
-        self._actions[robot].set_radar(direction)
+  def set_move(self, robot, direction, distance):
+    self._actions[robot].set_move(direction, distance)
 
-    def set_radar_return(self, robot, radar_return):
-        self._actions[robot].set_radar_return(radar_return)
+  def set_radar(self, robot, radar_direction, radar_return):
+    self._actions[robot].set_radar(radar_direction, radar_return)
 
-    def set_starting_position(self, robot, position):
-        self._actions[robot].set_starting_position
+  def set_lose_reason(self, robot, reason):
+    self._actions[robot].set_lose_reason(reason)
 
-    def set_ending_position(self, robot, position):
-        self._actions[robot].set_ending_positions
+  def add_damage_dealt(self, robot, damage):
+    self._actions[robot].dealt_damage(damage)
 
-    def set_lose_reason(self, robot, reason):
-        self._actions[robot].set_lose_reason
+  def add_damage_taken(self, robot, damage):
+    self._actions[robot].took_damage(damage)
 
-    def add_damage_dealt(self, robot, amount, description):
-        self._actions[robot].dealt_damage(Damage(amount, description))
+  def get(self, robot):
+    return self._actions[robot]
 
-    def add_damage_taken(self, robot, amount, description):
-        self._actions[robot].took_damage(Damage(amount, description))
+  def dump(self):
+    for robot, action in self._actions.items():
+      print "Robot", robot, "------------------------"
+      action.dump()
 
-        
 class Action:
-    def __init__(self):
-        self._shot = None  # Direction
-        self._radar = None  # Direction
-        self._radar_return = None  # RadarReturn
-        self._move = None  # Direction
-        self._starting_position = None  # Position
-        self._ending_position = None  # Position
-        self._damage_dealt = []  # Damage
-        self._damage_taken = []  # Damage
-        self._lose_reason = None  # string
+  def __init__(self, position, health):
+    self.starting_health = health
+    self.ending_health = health
+    self.starting_position = position
+    self.ending_position = position
+    self.shot_direction = None
+    self.shot_distance = None
+    self.radar_direction = None
+    self.radar_return = None
+    self.move_direction = None
+    self.move_distance = None
+    self.damage_dealt = []
+    self.damage_taken = []
+    self.lose_reason = None
 
-    def set_shot(self, shot):
-        self._shot = shot
+  def set_shot(self, direction, distance):
+    self.shot_direction = direction
+    self.shot_distance = distance
 
-    def set_radar(self, radar):
-        self._radar = radar
+  def set_radar(self, radar_direction, radar_return):
+    self.radar_direction = radar_direction
+    self.radar_return = radar_return
 
-    def set_radar_return(self, radar_return):
-        self._radar_return = radar_return
+  def set_move(self, direction, distance):
+    self.move_direction = direction
+    self.move_distance = distance
+    for i in range(distance):
+      self.ending_position = self.ending_position.move_by(direction)
 
-    def set_move(self, move):
-        self._move = move
+  def took_damage(self, damage):
+    self.damage_taken.append(damage)
+    self.ending_health = max (self.ending_health - damage.amount, 0)
 
-    def set_start_position(self, start_position):
-        self._start_position = start_position
+  def dealt_damage(self, damage):
+    self.damage_dealt.append(damage)
 
-    def set_end_position(self, end_position):
-        self._end_position = end_position
+  def set_lose_reason(self, reason):
+    self.lose_reason = reason
 
-    def took_damage(self, damage):
-        self._damage_taken.append(damage)
-
-    def dealt_damage(self, damage):
-        self._damage_dealt.append(damage)
-    
-    def set_lose_reason(self, reason):
-        self._lose_reason = reason
-
-Damage = (collections.namedtuple('DamageTuple', ['amount', 'description'])
+  def dump(self):
+    print "starting_health", self.starting_health
+    print "ending_health", self.ending_health
+    print "starting_position", self.starting_position
+    print "ending_position", self.ending_position
+    print "shot_direction", self.shot_direction
+    print "shot_distance", self.shot_distance
+    print "radar_direction", self.radar_direction
+    if self.radar_return:
+      print "radar_return.direction", self.radar_return.direction
+      print "radar_return.range", self.radar_return.range
+      print "radar_return.health", self.radar_return.health
+      print "radar_return.last_move_direction",
+      print self.radar_return.last_move_direction
+      print "radar_return.last_move_distance",
+      print self.radar_return.last_move_distance
+    print "move_direction", self.move_direction
+    print "move_distance", self.move_distance
+    for damage in self.damage_dealt:
+      print "damage_dealt.amount", damage.amount
+      print "damage_dealt.description", damage.description
+    for damage in self.damage_taken:
+      print "damage_taken.amount", damage.amount
+      print "damage_taken.description", damage.description
+    print "lose_reason", self.lose_reason

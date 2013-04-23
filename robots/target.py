@@ -1,5 +1,5 @@
-from robot import robot
+from robots import robot_module
 
-class Target(robot.Robot):
+class Target(robot_module.Robot):
   def round():
     pass
