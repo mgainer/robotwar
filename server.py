@@ -67,10 +67,10 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
 
 if __name__ == '__main__':
-  server = BaseHTTPServer.HTTPServer(
-      (os.environ.get('IP', socket.gethostname()),
-       int(os.environ.get('PORT', '80'))),
-      RequestHandler)
+  port = int(os.environ.get('PORT', '80'))
+  host = os.environ.get('IP', socket.gethostname())
+  print 'Server trying to bind to host "%s", port %d' % (host, port)
+  server = BaseHTTPServer.HTTPServer((host, port), RequestHandler)
   try:
     server.serve_forever()
   except:
