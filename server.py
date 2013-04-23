@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import cgi
 import httplib
 import mimetypes
@@ -23,8 +25,10 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
       self._action(params)
     else:
       path = url_parts.path
+      print 'path from url is "%s"' % path
       if path.endswith('/'):
         path = path + 'index.html'
+        print 'New path is "%s"' % path
       self._send_file(path)
 
   def do_POST(self):
@@ -42,7 +46,7 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     return postvars
 
   def _send_file(self, path):
-    file_path = 'www' + self.path
+    file_path = 'www' + path
     if not os.path.exists(file_path):
       self.send_error(httplib.NOT_FOUND, 'No such file "%s"' % file_path)
     else:
@@ -52,7 +56,7 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
       fp.close()
       self.send_response(httplib.OK)
       self.send_header('Content-Length', len(data))
-      self.send_header('Content-Type', mimetypes.guess_type(self.path)[0])
+      self.send_header('Content-Type', mimetypes.guess_type(path)[0])
       self.end_headers()
       self.wfile.write(data)
 
@@ -70,9 +74,8 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
 
 if __name__ == '__main__':
-  print os.environ
-  port = int(os.environ['OPENSHIFT_INTERNAL_PORT'])
-  host = os.environ['OPENSHIFT_INTERNAL_IP']
+  port = int(os.environ.get('OPENSHIFT_INTERNAL_PORT', '8080'))
+  host = os.environ.get('OPENSHIFT_INTERNAL_IP', socket.gethostname())
   print 'Server trying to bind to host "%s", port %d' % (host, port)
   server = BaseHTTPServer.HTTPServer((host, port), RequestHandler)
   try:
