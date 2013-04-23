@@ -1,4 +1,5 @@
 import collections
+import os
 
 class Terrain(collections.namedtuple(
     'TerrainTuple',
@@ -8,9 +9,6 @@ class Terrain(collections.namedtuple(
         'can_move_onto',
         'can_radar_through',
         'can_shoot_through',
-        # TODO(mgainer): Break down terrain can-do-X as a Capabilities class?
-        # Might be hard to abstract; semantics are pretty variable and interact
-        # with one another.
         ])):
 
   def __str__(self):
@@ -24,6 +22,10 @@ terrain_by_symbol = {
   PLAINS.symbol: PLAINS,
 }
 
+
+# TODO(anybody): Using space characters for plains is a lot less cluttered
+# visually, but makes it hard to edit maps.  Change character, or allow a
+# different character to be used when editing maps versus displaying them.
 
 class TerrainMap:
   def __init__(self, map_text, map_name):
@@ -48,7 +50,7 @@ class TerrainMap:
     rows = []
     for line in map_text.split('\n'):
 
-      # TODO(mgainer): Introduce a comment character so maps can contain
+      # TODO(anybody): Introduce a comment character so maps can contain
       # remarks as well as terrain definitions.
       if len(line) == 0:
         continue   # Skip leading or trailing blank lines.

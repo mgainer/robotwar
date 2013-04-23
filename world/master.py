@@ -84,10 +84,10 @@ class Master:
     for round_counter in range(self._options.max_rounds):
       round = self._do_round(round)
 
-      # TODO(mgainer): Better recognition of overall winner, collection
+      # TODO(anybody): Better recognition of overall winner, collection
       # of stats?
       if len(self._robot_data) == 1:
-        return robot_data.keys()[0]  # The winner
+        return self._robot_data.keys()[0]  # The winner
       elif len(self._robot_data) == 0:
         return None  # No winner - simultaneous death
     return None  # No winner - ran out of time.
@@ -95,11 +95,11 @@ class Master:
   def _do_round(self, previous_round):
     # First, find out what each robot wants to do.
     for robot, robot_data in self._robot_data.items():
-        # TODO(mgainer): Set a timer or some such to prevent infinite loops.
-        # TODO(mgainer): Is there a way to playpen off the robot so it can't
+        # TODO(anybody): Set a timer or some such to prevent infinite loops.
+        # TODO(anybody): Is there a way to playpen off the robot so it can't
         #   do any harm or rummage any data structures it's not supposed to?
         #   Is 'exec' a jail?
-        # TODO(mgainer): maybe profiling interface lets us limit number of
+        # TODO(anybody): maybe profiling interface lets us limit number of
         # VM cycles?
       last_move_info = self._build_last_move_info(previous_round, robot,
                                                   robot_data)
@@ -173,7 +173,7 @@ class Master:
     for exploding_robot, exploder_data in self._robot_data.items():
       explosion = exploding_robot.get_exception()
       if explosion:
-        self._damage_robot(round, exploding_robot, robot_module.Damage(
+        self._damage_robot(round, None, exploding_robot, robot_module.Damage(
             exploder_data.health,
             "exploded due to internal failure: " + str(explosion)))
     for dead_robot in dead_robots:
@@ -194,13 +194,22 @@ class Master:
     # until after all shots have been resolved.
     dead_robots = []
 
-    # TODO(mgainer): Add shots in the air; don't fully resolve shots
+    # TODO(anybody): Add shots in the air; don't fully resolve shots
     # immediately upon launch; rather move them some amount per round until
     # they've hit maximum range or something solid.
 
+    # TODO(anybody): Make shots cost health/energy, so you're not just
+    # spraying stuff around every turn, but rather have to think about it.
+
+    # TODO(anybody): Make shot distance and/or shot damage dependent on how
+    # much health/energy you put into it.
+
+    # TODO(anybody): Add a separate concept of energy, rather than just
+    # overall health.  More realistic, and a familiar game mechanism.
+
     for shooting_robot, shooter_data in self._robot_data.items():
 
-      # TODO(mgainer): Intentionally leaving open security hole where
+      # TODO(anybody): Intentionally leaving open security hole where
       # robot might override get_shot() to take control.  It's moderately
       # easily fixable without changing the official interface.
       shot_direction = shooting_robot.get_shot()
@@ -208,9 +217,9 @@ class Master:
         # Move shot before checking collisions so we don't shoot ourselves.
         shot_location = shooter_data.position
 
-        # TODO(mgainer): Allow robots to specify a range as well as a
+        # TODO(anybody): Allow robots to specify a range as well as a
         # direction (as long as the range is less or equal to max range.
-        # If shell stops in forest, will we set the forest on fire for
+        # If shell explodes in forest, will we set the forest on fire for
         # a little while?
         for shot_distance in range(1, self._options.shot_range+1):
           shot_location = shot_location.move_by(shot_direction)
@@ -234,7 +243,7 @@ class Master:
           if not self._map.get(shot_location).can_shoot_through:
             break
 
-          # TODO(mgainer): Add destructible terrain?  If there is, say,
+          # TODO(anybody): Add destructible terrain?  If there is, say,
           # a "boulder" terrain type that's un-shootable and un-moveable,
           # but if it absorbs enough shots, it gets destroyed, and becomes
           # some other terrain type...
@@ -242,7 +251,7 @@ class Master:
         round.set_shot(shooting_robot, shot_direction, shot_distance)
 
     # Any robots destroyed by shots don't get to move or send radar.
-    # TODO(mgainer): Dead robots leave corpses that can't be moved through?
+    # TODO(anybody): Dead robots leave corpses that can't be moved through?
     #   Implement this as just a change to terrain?
     for robot in dead_robots:
       del self._robot_data[robot]
@@ -270,7 +279,7 @@ class Master:
           # movement takes place.
           target_robot, target_data = self._find_robot(new_position)
           if target_robot is not None:
-            # TODO(mgainer): Set different amount of damage to move-er and
+            # TODO(anybody): Set different amount of damage to move-er and
             # move-ee?  (Ramming is a valid strategy as long as you have
             # more health than the vicitim...)
             damage = robot_module.Damage(self._options.collision_damage,
@@ -285,12 +294,14 @@ class Master:
               dead_robots.append(moving_robot)
             self._move_robot(round, moving_robot, move_direction, 0)
           else:
-            # TODO(mgainer): Damage or bonus from successfully moving onto
-            # terrain?
+            # TODO(anybody): Damage or bonus from successfully moving onto
+            # special types of terrain?  E.g., moving into mountains costs
+            # more energy than moving across plains?  (Mountains should give
+            # some kind of bonus in return, though...)
             self._move_robot(round, moving_robot, move_direction, 1)
             mover_data.position = new_position
         else:
-          # TODO(mgainer): Damage from trying to move into un-moveable
+          # TODO(anybody): Damage from trying to move into un-moveable
           # terrain and failing?
           self._move_robot(round, moving_robot, move_direction, 0)
 
@@ -348,10 +359,13 @@ class Master:
     """
     if causing_robot is not None:
       round.add_damage_dealt(causing_robot, damage)
+
+    # TODO(anybody): Add information about what direction the shot came from
+    # so the robot getting shot can know which way to dodge.
     round.add_damage_taken(target_robot, damage)
     self._robot_data[target_robot].health -= damage.amount
     if self._robot_data[target_robot].health <= 0:
-      # TODO(mgainer): Add record of kills to play history.
+      # TODO(anybody): Add record of kills to play history.
       round.set_lose_reason(target_robot, damage.description)
       return True  # Dead
     return False  # Not dead

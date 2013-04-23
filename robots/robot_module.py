@@ -79,6 +79,11 @@ class Robot:
     In it, you should call the set_move(), set_radar(), and set_shot() functions
     to tell the master what you want your robot to do this round.
 
+    TODO(anybody): Add options info to MoveData structure.  Robots need to know
+    the range of the radar and range of shots -- if you see a robot on radar
+    that's further away than your cannon can reach, you need to move towards
+    it, rather than shoot at it.
+
     Args:
       data: A robot.MoveData instance.  This is filled out with the results
         of the previous round of game play.  This tells you what damage
@@ -103,7 +108,7 @@ def load_robots(names, world_map):
   for id_number, name in enumerate(names):
     fp, path, desc = imp.find_module(os.path.join('robots', name.lower()))
 
-    # TODO(mgainer): Better handling of exceptions at load time for when we
+    # TODO(anybody): Better handling of exceptions at load time for when we
     # are running as a web application.
     robot_module = imp.load_module(name, fp, path, desc)
     cloned_map = copy.deepcopy(world_map)  # No cheating messing with the map!
