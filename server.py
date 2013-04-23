@@ -22,7 +22,10 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
       params['path'] = url_parts.path
       self._action(params)
     else:
-      self._send_file(url_parts.path)
+      path = url_parts.path
+      if path.endswith('/'):
+        path = path + 'index.html'
+      self._send_file(path)
 
   def do_POST(self):
     self._action(self._parse_post())
@@ -67,8 +70,9 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
 
 if __name__ == '__main__':
-  port = int(os.environ.get('PORT', '80'))
-  host = os.environ.get('IP', socket.gethostname())
+  print os.environ
+  port = int(os.environ['OPENSHIFT_INTERNAL_PORT'])
+  host = os.environ['OPENSHIFT_INTERNAL_IP']
   print 'Server trying to bind to host "%s", port %d' % (host, port)
   server = BaseHTTPServer.HTTPServer((host, port), RequestHandler)
   try:
