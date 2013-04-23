@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 
 import imp
-import os
-import sys
 import optparse
+import os
+import random
+import sys
+import time
 
 from robots import robot_module
 from world import master
@@ -20,8 +22,8 @@ def parse_options(argv):
   parser.add_option('--collision_damage', type='int', default=5)
   parser.add_option('--radar_range', type='int', default=50)
   parser.add_option('--robot_health', type='int', default=30)
-  parser.add_option('--map')
-  parser.add_option('--random_seed', type='int', default=0)
+  parser.add_option('--map', default='tiny')
+  parser.add_option('--random_seed', type='int', default=time.time())
   options, unused_argv = parser.parse_args(argv)
   return options
 
@@ -29,12 +31,11 @@ def parse_options(argv):
 def main(argv):
   options = parse_options(argv)
   random.seed(options.random_seed)
-  world_map = terrain_map.TerrainMap(terrain_map.read_map(options.map))
-  robots = robot.load_robots(options.robots, world_map)
+  world_map = terrain.TerrainMap(terrain.read_map(options.map), options.map)
+  robots = robot_module.load_robots(options.robots, world_map)
   history = play_history.PlayHistory()
-  master = world.master(options, robots, world_map, history)
-  master.run()
-  history.dump(world_map)
+  master.Master(options, robots, world_map, history).run()
+  history.dump()
 
 
 if __name__ == '__main__':
