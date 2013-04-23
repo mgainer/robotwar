@@ -1,5 +1,14 @@
 import collections
 
+# TODO(anybody): Write an entirely separate program to consume that output
+# and produce:
+# - cheapo ASCII graphics
+# - better tile-based graphics
+# - sound
+
+# TODO(anybody): Hook up robotwar as a web application.  Submit names of robots
+# from a web page, and display outputs using HTML5 animations
+
 class PlayHistory:
   def __init__(self):
     self._rounds = []
@@ -13,6 +22,9 @@ class PlayHistory:
     for number, round in enumerate(self._rounds):
       print "======================== Round %d =====================" % number
       round.dump()
+
+  def simple(self):
+    return [round.simple() for round in self._rounds]
 
 class Round:
   def __init__(self):
@@ -47,6 +59,9 @@ class Round:
     for robot, action in self._actions.items():
       print "Robot", robot, "------------------------"
       action.dump()
+
+  def simple(self):
+    return {r.name: a.simple() for r, a in self._actions.iteritems()}
 
 class Action:
   def __init__(self, position, health):
@@ -113,3 +128,6 @@ class Action:
       print "damage_taken.amount", damage.amount
       print "damage_taken.description", damage.description
     print "lose_reason", self.lose_reason
+
+  def simple(self):
+    return self.__dict__

@@ -1,7 +1,11 @@
 import collections
 import os
 
-class Terrain(collections.namedtuple(
+class NamedTupleToJson:
+  def simple(self):
+    return self.__dict__
+
+class Terrain(NamedTupleToJson, collections.namedtuple(
     'TerrainTuple',
     [
         'name',
@@ -102,6 +106,9 @@ class TerrainMap:
 
   def __eq__(self, other):
     return self._map == other._map
+
+  def simple(self):
+    return self._map
 
 def read_map(map_name):
   """Reads text of map from file.

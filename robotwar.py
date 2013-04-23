@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import imp
+import simplejson
 import optparse
 import os
 import random
@@ -28,14 +29,23 @@ def parse_options(argv):
   return options
 
 
-def main(argv):
-  options = parse_options(argv)
+def run(options):
   random.seed(options.random_seed)
   world_map = terrain.TerrainMap(terrain.read_map(options.map), options.map)
   robots = robot_module.load_robots(options.robots, world_map)
   history = play_history.PlayHistory()
   master.Master(options, robots, world_map, history).run()
+  return history
+
+
+def main(argv):
+  options = parse_options(argv)
+  run(options)
   history.dump()
+  print simplejson.dumps({
+      'history': history.simple(),
+      'map': world_map.simple(),
+      }, indent=2)
 
 
 if __name__ == '__main__':
