@@ -1,3 +1,4 @@
+import copy
 import random
 import sys
 import traceback
@@ -133,7 +134,7 @@ class Master:
       A play_history.Round instance ready to accept facts about robots.
     """
 
-    round = self._play_history.new_round()
+    round = self._play_history.new_round(self._map)
     for robot, robot_data in self._robot_data.items():
       round.add_robot(robot, robot_data.position, robot_data.health)
       robot_data.radar_return = None

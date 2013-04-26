@@ -1,4 +1,5 @@
 import collections
+import copy
 
 # TODO(anybody): Write an entirely separate program to consume that output
 # and produce:
@@ -13,8 +14,9 @@ class PlayHistory:
   def __init__(self):
     self._rounds = []
 
-  def new_round(self):
+  def new_round(self, world_map):
     round = Round()
+    round._world_map = copy.deepcopy(world_map)
     self._rounds.append(round)
     return round
 
@@ -55,10 +57,35 @@ class Round:
   def get(self, robot):
     return self._actions[robot]
 
+  def _print_map(self, position_type):
+    """Print out a textual map of the game
+
+    Args:
+      position_type:
+        'starting' to print robots in starting position
+        'ending' to print robots in ending position
+    """
+    def _add_symbol(position, symbol):
+      map_array[position.y][position.x] = symbol
+
+    map_array = self._world_map.get_map_array()
+    robotnum = 0
+    for robot, robot_data in self._actions.iteritems():
+      if position_type == 'starting':
+        pos = robot_data.starting_position
+      else:
+        pos = robot_data.ending_position
+      _add_symbol(pos, chr(ord('0') + robotnum))
+      robotnum += 1
+    for line in map_array:
+      print ' '.join(line)
+
   def dump(self):
+    self._print_map('starting')
     for robot, action in self._actions.items():
       print "Robot", robot, "------------------------"
       action.dump()
+    self._print_map('ending')
 
   def simple(self):
     return {r.name: a.simple() for r, a in self._actions.iteritems()}
