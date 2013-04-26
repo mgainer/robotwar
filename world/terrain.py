@@ -96,13 +96,26 @@ class TerrainMap:
   def height(self):
     return len(self._map)
 
-  def dump(self):
+  def get_map_array(self):
+    """Get a printable map of the terrain.
+
+    Return:
+      List of rows,
+        each containing a list of symbol characters for each column
+    """
     width = len(self._map[0])
     height = len(self._map)
+    map_array = []
     for y in range(height):
+      line = []
       for x in range(width):
-        print self._map[y][x],
-      print
+        line.append(str(self._map[y][x]))
+      map_array.append(line)
+    return map_array
+
+  def dump(self):
+    for line in self.get_map_array():
+      print ' '.join(line)
 
   def __eq__(self, other):
     return self._map == other._map
