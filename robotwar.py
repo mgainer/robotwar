@@ -35,12 +35,12 @@ def run(options):
   robots = robot_module.load_robots(options.robots, world_map)
   history = play_history.PlayHistory()
   master.Master(options, robots, world_map, history).run()
-  return history
+  return history, world_map
 
 
 def main(argv):
   options = parse_options(argv)
-  run(options)
+  history, world_map = run(options)
   history.dump()
   print simplejson.dumps({
       'history': history.simple(),
