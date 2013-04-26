@@ -16,6 +16,7 @@ from world import terrain
 
 def parse_options(argv):
   parser = optparse.OptionParser()
+  parser.add_option('--full_dump', action='store_true')
   parser.add_option('--robot', action='append', dest='robots')
   parser.add_option('--max_rounds', type='int', default=1000)
   parser.add_option('--shot_range', type='int', default=30)
@@ -42,10 +43,11 @@ def main(argv):
   options = parse_options(argv)
   history, world_map = run(options)
   history.dump()
-  print simplejson.dumps({
-      'history': history.simple(),
-      'map': world_map.simple(),
-      }, indent=2)
+  if options.full_dump:
+    print simplejson.dumps({
+        'history': history.simple(),
+        'map': world_map.simple(),
+        }, indent=2)
 
 
 if __name__ == '__main__':
