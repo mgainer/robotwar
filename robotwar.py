@@ -1,18 +1,30 @@
 #!/usr/bin/env python
 
 import imp
-import simplejson
 import optparse
 import os
 import random
+import StringIO
 import sys
 import time
 
+from output import output_module
 from robots import robot_module
 from world import master
 from world import play_history
 from world import terrain
 
+class BadOptions(Exception):
+  def __init__(self, error_code, message):
+    self._error_code = error_code
+    self._message = message
+
+  def __str__(self):
+    return "bad options; error %d: %s" % (self._error_code, self._message)
+
+
+def raise_bad_options(error_code, message):
+  raise BadOptions(error_code, message)
 
 def parse_options(argv):
   parser = optparse.OptionParser()
@@ -26,7 +38,17 @@ def parse_options(argv):
   parser.add_option('--robot_health', type='int', default=30)
   parser.add_option('--map', default='tiny')
   parser.add_option('--random_seed', type='int', default=time.time())
+  parser.add_option('--output', default='Ascii')
+
+  # Stupid optparse is written to sys.exit() if it doesn't like the options,
+  # rather than throw.  Psych it out by temporarily replacing sys.exit().
+  save_exit = sys.exit
+  save_stderr = sys.stderr
+  sys.stderr = StringIO.StringIO()
+  sys.exit = lambda err: raise_bad_options(err, sys.stderr.getvalue())
   options, unused_argv = parser.parse_args(argv)
+  sys.exit = save_exit
+  sys.stderr = save_stderr
   return options
 
 
@@ -42,12 +64,8 @@ def run(options):
 def main(argv):
   options = parse_options(argv)
   history, world_map = run(options)
-  history.dump()
-  if options.full_dump:
-    print simplejson.dumps({
-        'history': history.simple(),
-        'map': world_map.simple(),
-        }, indent=2)
+  outputter = output_module.load_outputter(options.output, history, world_map)
+  outputter.get_output(sys.stdout)
 
 
 if __name__ == '__main__':

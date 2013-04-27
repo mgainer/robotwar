@@ -8,6 +8,8 @@ import socket
 import urlparse
 import BaseHTTPServer
 
+import robotwar
+from output import rwjson
 
 class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
   """Very simple web server.
@@ -61,16 +63,45 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
       self.wfile.write(data)
 
   def _action(self, params):
+    argv = []
+    for key, values in params.iteritems():
+      if key == 'path':
+        continue
+      for value in values:
+        if value:
+          argv.append('--%s=%s' % (key, value))
+        else:
+          argv.append('--%s' % key)
+
+    try:
+      options = robotwar.parse_options(argv)
+    except Exception, ex:
+      self.send_error(httplib.BAD_REQUEST, str(ex))
+      return
+
+    array_buffer = ArrayBuffer()
+    try:
+      history, world_map = robotwar.run(options)
+      json_writer = rwjson.Rwjson(history, world_map)
+      json_writer.get_output(array_buffer)
+    except Exception, ex:
+      self.send_error(httplib.INTERNAL_SERVER_ERROR, str(ex))
+      return
+
     self.send_response(httplib.OK)
     self.end_headers()
-    self.wfile.write('I see you having %d parameters<br>\n' % len(params))
-    for key, val in params.iteritems():
-      self.wfile.write('post variable "%s": "%s"\n<br>\n' % (key, val))
+    self.wfile.write(array_buffer.get())
 
-    # TODO(anybody): Accept various commands and return content.
-    # - No command returns a page displaying maps, robots to choose.
-    # - POST specifying robots and a map runs a battle and returns results.
 
+class ArrayBuffer:
+  def __init__(self):
+    self.lines = []
+
+  def write(self, line):
+    self.lines.append(line)
+
+  def get(self):
+    return ''.join(self.lines)
 
 
 if __name__ == '__main__':

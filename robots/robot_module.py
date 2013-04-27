@@ -9,6 +9,9 @@ class Robot:
     self._map = world_map
     self.pre_round()
 
+  def get_id_number(self):
+    return self._id_number
+
   def pre_round(self):
     self._move_direction = None
     self._radar_direction = None

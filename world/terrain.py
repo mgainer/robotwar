@@ -1,4 +1,5 @@
 import collections
+import copy
 import os
 
 class NamedTupleToJson:
@@ -97,31 +98,31 @@ class TerrainMap:
     return len(self._map)
 
   def get_map_array(self):
-    """Get a printable map of the terrain.
+    """Get a copy of the map as a 2-d array, column-primary.
 
-    Return:
-      List of rows,
-        each containing a list of symbol characters for each column
+    Use as:  world_map.get_map_array[x_index][y_index].symbol()
+
+    Return: List of lists of Terrain.  Outer list is map columns, left-to-right.
+      Inner list is the terrain items within a column, top-to-bottom.
     """
-    width = len(self._map[0])
-    height = len(self._map)
-    map_array = []
-    for y in range(height):
-      line = []
-      for x in range(width):
-        line.append(str(self._map[y][x]))
-      map_array.append(line)
-    return map_array
+    return [[row[i] for row in self._map] for i in range(self.width)]
 
-  def dump(self):
-    for line in self.get_map_array():
-      print ' '.join(line)
+  def get_map_rows(self):
+    """Get a copy of the map as a 2-d array, column-primary.
+
+    Useful for printing out the map row-by-row.  Use as:
+    for row in world_map.get_map_rows:
+      for terrain in row:
+        print terrin.symbol
+
+    Return: List of lists of Terrain.  Outer list is map rows, top-to-bottom.
+      Inner list is the terrain items within a row, left-to-right
+    """
+    return copy.copy(self._map)
 
   def __eq__(self, other):
     return self._map == other._map
 
-  def simple(self):
-    return self._map
 
 def read_map(map_name):
   """Reads text of map from file.
