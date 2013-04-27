@@ -20,6 +20,8 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
   """
 
   def do_GET(self):
+    if os.path.isdir('robotwar'):
+      os.chdir('robotwar')
     url_parts = urlparse.urlparse(self.path)
     params = urlparse.parse_qs(url_parts.query)
     if params:
@@ -34,6 +36,8 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
       self._send_file(path)
 
   def do_POST(self):
+    if os.path.isdir('robotwar'):
+      os.chdir('robotwar')
     self._action(self._parse_post())
 
   def _parse_post(self):
