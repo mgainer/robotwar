@@ -16,7 +16,7 @@
 }
 #name {
   text-align: center;
-  font-family: "8bit"/*, Courier, monospace*/;
+  font-family: "8bit", Courier, monospace;
   font-size: 48px;
 }
 .container_12 {
@@ -24,6 +24,11 @@
 	height: auto;
 	color: #FFF;
 	margin-top: 16px;
+}
+span.h1 {
+	margin-left:32px;
+	font-family: "8bit", Courier, monospace;
+	font-size: 18px;
 }
 #floater {
 	position: fixed;
