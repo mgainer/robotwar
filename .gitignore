@@ -5,3 +5,6 @@
 
 # Python compiled files
 *.pyc
+
+# Mac Hidden Files
+.DS_Store
