@@ -21,6 +21,7 @@ class Terrain(NamedTupleToJson, collections.namedtuple(
 
 WALL = Terrain('wall', '#', False, False, False)
 PLAINS = Terrain('plains', ' ', True, True, True)
+LAVA = Terrain('lava', '&', False, True, True)
 
 terrain_by_symbol = {
   WALL.symbol: WALL,
