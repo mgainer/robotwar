@@ -1,0 +1,47 @@
+@font-face { 
+    font-family: "8bit";
+    src: url("8BIT.TTF") format('truetype');
+}
+#robotleft, #robotright {
+  background-size: 64px 64px;
+  background-position: 50%;
+  height: 64px;
+  background-repeat: no-repeat;
+}
+#robotleft {
+  background-image: url(robot0.png)
+}
+#robotright {
+  background-image: url(robot1.png)
+}
+#name {
+  text-align: center;
+  font-family: "8bit", Courier, monospace;
+  font-size: 48px;
+}
+.container_12 {
+	background-color: #000;
+	height: auto;
+	color: #FFF;
+	margin-top: 16px;
+}
+span.h1 {
+	margin-left:32px;
+	font-family: "8bit", Courier, monospace;
+	font-size: 18px;
+}
+#floater {
+	position: fixed;
+	top:0px;
+	height:100%;
+	width:960px;
+	background-color: #000;
+	z-index: -1;
+	box-shadow: 0px 0px 16px #000;
+}
+body {
+	margin:0;
+	padding:0;
+	background-color: #222;
+	background-image: url(gray.png)
+}
